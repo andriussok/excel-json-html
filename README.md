@@ -7,7 +7,7 @@ Get elements from excel/CSV file, convert them to JSON object and wrap everythin
 ## Usage
 
 1. **For JSON object** In our excel/csv test file
-	* the top/first row is for Object.keys *(LW,TW,Title,Artist,Link,...useAnyKeyName)*
+  * the top/first row is for Object.keys *(LW,TW,Title,Artist,Link,...useAnyKeyName)*
   * every row below is Object.key.value
   Drop your file in the dropzone, and manually open parsed **JSON object** from accordion.
 
