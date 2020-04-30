@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+      <meta name="author" content="Andrius Sokolnikovas, https://www.linkedin.com/in/andriussok/">
+      <meta name="description" content="Excel to JSON to HTML">
+      <meta name="keywords" content="HTML, CSS, JavaScript">
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+      
+      <title>Excel to JSON to HTML</title>
+      <!-- CDN CSS source -->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">      
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+      
+      <style>
+        html,textarea.materialize-textarea {font-size: 12px}
+        textarea {height: initial;height: 200px; max-width: 100%; min-width: 100%}
+        .file-field.dropzone-area{ height: 120px; border: 2px dashed lightgray; margin: 0 auto; margin-bottom: 1em; text-align: center; transition: all 0.3s }
+        .dropzone-area input[type=text].file-path { border: none !important; text-align: center; padding-top: 40px; }
+        .dropzone-area .file-path-wrapper { padding-right: 10px; }
+        .upload-area:hover{ cursor: pointer; }
+        .file-field.dropzone-area:hover,.file-field.dropzone-area.dragging { filter: alpha(opacity=100); -khtml-opacity: 1; -moz-opacity: 1; opacity: 1; background: #e6f1ff; transition: all 0.2s}
+
+        .switch label input[type=checkbox]:checked+.lever { background-color: #bbdefb; }
+        .switch label input[type=checkbox]:checked+.lever:after { background-color: #2196F3;}
+        .switch label input[type=checkbox]:checked:not(:disabled) ~ .lever:active::before { background-color: rgba(33,150,243,0.2) }
+      </style>
+</head>
+<body>
+
+  <nav>    
+      <div class="nav-wrapper green darken-2">
+        <a href="" class="brand-logo" style="padding-left: 1em">Excel to JSON <span style="font-size: 0.5em">parser&nbsp;&&nbsp;HTML&nbsp;repeater</span></a>
+      </div>
+    </div>
+  </nav>
+  <br>
+  <div class="container">
+    <div class="section">
+      <div class="row" style="margin-bottom: 0">
+          <form class="col s12" enctype="multipart/form-data">
+
+            <div class="row">
+              <div class="col s12 m8 offset-m2">
+                <div class="file-field input-field">
+                  <div class="btn-large waves-effect waves-light blue">
+                    <i class="material-icons left">cloud_upload</i><span>Browse</span>
+                    <input id="upload" type="file" name="files[]" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                  </div>
+                  <div class = "file-path-wrapper">
+                     <input class = "file-path validate" type = "text" placeholder = "Upload file">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col s12">
+                <ul class="collapsible">
+                  <li class="active">
+                    <div class="collapsible-header"><i class="material-icons">add</i>Dropzone</div>
+                    <div class="collapsible-body">
+                      <div class="file-field input-field dropzone-area">
+                        <input id="dropzone" class="upload-area" type="file" name="files[]" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                        <div class="file-path-wrapper">
+                          <input class="file-path validate" type="text" placeholder="Dropzone (.xls .xlsx .csv)">
+                        </div>
+                      </div>
+                      <label for="dropzone">Drop files here or click to Browse</label>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="collapsible-header"><i class="material-icons">filter_drama</i>JSON object</div>
+                    <div class="collapsible-body">
+                        <!-- Switch -->
+                        <div class="switch">
+                          <label>
+                            Ugly
+                            <input type="checkbox">
+                            <span class="lever"></span>
+                            Pretty
+                          </label>
+                        </div><br>
+                        <script type="text/javascript">
+                          $('.switch input').click(function() {
+                            if ($(this).is(':checked')) {
+                              $('#xlx_json').hide(); $('#xlx_json_pretty').show();
+                            } else {
+                              $('#xlx_json').show(); $('#xlx_json_pretty').hide();
+                            }
+                        });
+                        </script>
+
+                        <textarea class="form-controls aterialize-textarea" rows=50 cols=100 id="xlx_json" placeholder="Upload excel / csv file to get JSON Object"></textarea>
+                        <textarea class="form-controls aterialize-textarea" rows=50 cols=100 id="xlx_json_pretty" placeholder="Upload excel / csv file to get JSON Object" style="display: none;"></textarea>
+                        <label for="xlx_json">JSON Object</label>
+                    </div>
+                  </li>
+                  
+                  <li id="xlx_html-wrap">
+                    <div class="collapsible-header"><i class="material-icons">code</i>HTML code</div>
+                    <div class="collapsible-body">
+                        <textarea class="form-controls aterialize-textarea" rows=50 cols=100 id="xlx_html"></textarea>
+                        <label for="xlx_html">HTML from JSON</label>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </form>
+          
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="row">
+        <div class="col s12 center">
+            <span>Get elements from excel/CSV file, convert them to JSON object and wrap everything in HTML tags.</span>
+        <br class="hide-on-med-and-down  show-on-large">
+            <span>In excel/csv file use the First row for JSON keys, all rows below will be assigned as a new object per row with key values.</span>
+        <br class="hide-on-med-and-down show-on-large">
+            <span>From there you can use ${object.Key} in HTML template to wrap everything as you need.</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s12 center">
+          <img width="24" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAADmElEQVRoge3aTWgeRRgH8F9qCm0U+yEVqWCkihKL2Fg9CHoRBUFPCh48CB5KUVDxItRbLX4FD3orCIpY8eOmoKgUBC8qNUZRqxKRaBRbrbbFijUY42F2ePed7L5fu3lXIX94WGaeZ595/jOzO8/M7oiVw1pMYAcms+sOvIy762pktCY/Z+FSbMfOTK7E+gLbq2tqE4MROE+rN2PPXow1id0JfIBPMINjeHPgSEvQjcBWrR7dicuwrcDuJ3yBw5jO5DCWcjbjVYMtQiSwFpckgU7inJJgp3NyCEdWIrheMIoDuF0gkccCPhaGP06DT3GqYptn44aKPn7AV7GwhL/xHp7GXcK8TglVxUTWVl3yJIxkhWPYUnPAKcYxh+M4WNHXzcLsOZNA4JeKDnvBeNbWRzX4mst8jaWvvv8dVgk0jbpSiX5wPh7PlWfwCq7FLR3u2y/M/WUY9kOcyguZ/oESfZTrcr7msrqxJkbgezySK89m14PY3eG+2TJF2QjchN8SeazEx62J3VFclNisyGuUzlPoLe3DeMryBe8MrcQtyhMFvhohMCHkRPngHk5sdif6eWF/kKIRAvBUEuAJbMx067OA8/rbSvw0RmAjfk6C3JPp9iT1b3fwEwn8IZCIsi/T35HUpzI5KAHYlQR6FBuExCzWnRb2FN0I1Poa7ZXAGqEX8g5fTMr7Su9uJ/CZsKuLcm6m35DUp7KuCgG4Bv8o7p3vZKltDwQay0bfF3q9CPcJc3vo6DeZWyyp31w1kEHRTypxI+7MlZeEHR1h4XpNWIV7aXNTrrwgjN46xedIEb8LW99l6OUZGMM3WnN+Ec9rfw72d/HRaDK3V3tu8wYeFd7d0ccuPIcPu/j6Cz/myrHzTuLbDvedLlN0G4ErtKcTi1kdPKO9l6aF3KgIjazEo5a//5/N6bcK8zevv7fEVyMEHkyC+xMXJDZTic1JgViKoRO4UEif88FNFdhtwq+J3YECu6ETeCcJ6rjis1J4KLFdwvWJzYoQaOJkrmhL+S4uF9KVMryudYg8l/lr5GSukXWgThwRFsGImex6SPFWNGK+TDHsEVg9G81jlUDTaOIh3oZXK/rYIiSFC4SHYRifmMpeo4PKFGFD0ukj3+fq+8gXF7JZ3DOgj4h5fE1rRzWMz6yRwDSuGjj0BCNd9FU+dH8pnGJENEKgCP38apCffvFXg8YJFKGfnz3+kwSKUPS7zXa8hPvrauRfRU3Bu/Q7flIAAAAASUVORK5CYII=">
+          <i class="material-icons">keyboard_arrow_right</i>
+          <img width="24" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAAC7klEQVRoge3YTYiVVRzH8c/MpBQNmKA1qJAMSKXhRigiTIJMEc1VEYPQIjFQQxeiVKsIoiIXrlzZogShnKhIUANfIIgSN9PArBJ1tKnGNzJf0pxxcc7FZ57u3PF57nPnueL9weXcc/7n5f/l/M9zXqiuxRht0O8AHhpn3Mx6YAL7TfxT0FjtmIaX8S1W41pBff9PlRnoLbDPx42diYMKmIn2ejvIodM4iaX4Rp0QZQAMYwlOuBNOuSHKACDMwosCxFJ1QJQFQEEQZQJQAETZANQJ0QwA1AHRLADkhGgmAHJANBsAGSEmOgs1QrPx0V3UO4Zud3bsV/Dv3Q4yGWehrL/F1TqdzBkYxms52m3BM+MZJxPgKr7K0e51NQCacRFnUgugbLUAytZ9CfA2vsT0RFkP9mI/1qXq9+AofsCKlG0nPknkl8e+u3P4NUa1duIvom1WzG+N+T9wFl8n6vZE2+/4G//h+YR9ECOYF/MbY/1FiTq9auzERYTQFvQJR4U52JCwvYdzeAIvoQObUu3b8GbewesFeBAzcEY4aI1iKNoWYL4QWpfxC/qxElNT/byBKXkcqBfgOn4WnkfWpGxPxbQ/UdYvHI0fS5SdQZcANprVgSJC6C1cEdbGh4k+K06eT9QdjmlXouwYBrAWN7IOXgRAH54TLiDv4N1U3x1VxkuXfYZlmJl18KL2gQG8IMT/NiFM/oy2aYl6j8T0UsqHz3FL+GplUh6AyhH8Zqr8LL5Hp3DrGozlTyfqzBfC5ESq7V/4Tlj4mZQHoFv44lRi+9GYdmBhdHAQx3FRuAo+jCej/Yjqsb4rhy+ZAD7AIeFysU/YgGYKl/AfhTB6FjsEwBv4VJiNn4Tn9Hbj34cP4lQjAeZgLvZgfSxrw24htoexWVjIFX2M94WwGsKrOJyw/4rf4v8RbBdm7moGv6qqEZf6vGr4UaJUtQDKVgugbLUAylYLoGzd8wATvU6vwoXJcKSGOmsZJwKYYuz7T9PpNhYUxPJZTvanAAAAAElFTkSuQmCC">
+          <i class="material-icons">keyboard_arrow_right</i>
+          <img width="24" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAACmElEQVRoge3YyWpUQRTG8R+JoqAxGleiohJ8gBgQBwJm4YDgwgH1AXShuPQhFLdZCqJZalDBhRsnFFHBhYJEcDaOOCAao0aMLqra7iSd7r493Q70B5fq6lO36vz7nLp1+pJfPfhbo+siZk+xbmLNKGL/jeEqrdWCdmzGAHbgV5XmnqRMBAaqOOcyNYhES6UTlKHneCIbiVmVTJYGwCdswGNsxXkVRCINAHiFXgFiM84pEyItAKoEkSYAVYBIG4AsRGZjn5UAohEAGA+xRQKIRgGAIWVANBIAZUA0GgAJIYrVQrXQYhwpYdxtdAoQZ7BTgtqpHrVQ0qsn36T1jMAH7C7jvsNYPZWxngAjOF3GfXsVAGjETZxITYC01QRIW9MeIMlj9BB+4njs9wqPt5PYhEUTxn9Hn/D2YSX68SbaFmJf7PejDQfxABeSQuRTvpP4LQZz+sfimG7cMfnkfBvHXYr9fTn37orf3Y/9JbF/Ko8vAwqcxNVKoe1C3TKIL/Hzmmhrj22uA+tiO6/Shat1Er+O7SjG8DTH1oGPxgOsj9/Nr3ThemziDlzFCizFHHThmpD7FfmQ9OZOoU5/gv0ljG8VnLwuRGYtVgk5fSuu35bQh3FKmkKjsunRKpvfU6ldcPIdHgr74iXu4WvOmLGEfvxX0ggMYWO8SqksF8R2BDcFgG7cwI9oK/YjFFSt90AGYFjI+S4hjS7jW7Q1NEBHbDMAs7FciEDmtX1DA+RGYAjPcFc4KzIRyH2U7sHneB0tZYEkm7hPKCUyuoI/wgbN6ITxv+jT6Mj72D8gm/svou2RADPR4ZsJfJukWvypL1d1KSVSUxMgbTUB0lYTIG01AdLWtAcoVgttEwqrNDW3kLEYwEzZirIh9Q9N37fpAoRkogAAAABJRU5ErkJggg=="><a style="display: none" href="https://icons8.com/icon/4799/html-filetype">HTML Filetype icon by Icons8</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CDN JS source -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.5/jszip.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.5/xlsx.min.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.5/xlsx.full.min.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+  <!-- Custom JS -->
+  <script type="text/javascript">
+      var ExcelToJSON = function() {
+
+        this.parseExcel = function(file) {
+          var reader = new FileReader();
+
+          reader.onload = function(e) {
+            var data = e.target.result;
+            var workbook = XLSX.read(data, {
+              type: 'binary'
+            });
+            workbook.SheetNames.forEach(function(sheetName) {
+              // Here is your object
+              var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+              var json_object = JSON.stringify(XL_row_object);
+              console.log(JSON.parse(json_object));
+              jQuery( '#xlx_json' ).val( json_object );
+
+              let json_object2html = JSON.parse(json_object);
+              fn_json2html(json_object2html);
+
+              // Pretiffy
+              let pretty = JSON.stringify(json_object2html, undefined, 2);
+              let ugly = document.getElementById('xlx_json_pretty').value;
+              document.getElementById('xlx_json_pretty').value = pretty;
+              
+              activateLi();
+            })
+          };
+
+          reader.onerror = function(ex) {
+            console.log(ex);
+          };
+
+          reader.readAsBinaryString(file);
+        };
+    };
+
+    function handleFileSelect(evt) {
+      var files = evt.target.files; // FileList object
+      var xl2json = new ExcelToJSON();
+      xl2json.parseExcel(files[0]);
+    }
+
+  </script>
+
+  <script type="text/javascript">
+    document.getElementById('upload').addEventListener('change', handleFileSelect, false);
+    document.getElementById('dropzone').addEventListener('change', handleFileSelect, false);
+    
+    // Initiate collapsable
+    $(document).ready(function(){
+      $('.collapsible').collapsible();
+    });
+
+    // Open xlx_html li tab when it's ready
+    function activateLi() {
+        if(!$('#xlx_html-wrap').hasClass("active")) {
+          $('#xlx_html-wrap .collapsible-header').trigger('click')  
+        }
+      }
+
+    // Styling dropzone
+    let dropzone = document.getElementById('dropzone');
+
+    dropzone.addEventListener('dragenter', function (e) {
+        dropzone.parentNode.classList = 'file-field input-field dropzone-area dragging';
+    }, false);
+
+    let eventList = ["dragleave", "dragdrop", "change"];
+    for(event of eventList) {
+        dropzone.addEventListener(event, function (e) {
+          dropzone.parentNode.classList = 'file-field input-field dropzone-area';
+        }, false);  
+    }
+  </script>
+
+  <script type="text/javascript">
+/* 
+* HTML Template.
+* Pass a function to map and wrap JSON in HTML tags for each object.
+* Use template literals `${obj.key}` to add elements dynamically.
+*/
+
+function fn_json2html(json_object) {
+
+    json_object.map((obj) => { 
+      document.getElementById('xlx_html').value += 
+`<tr class="chart-row">
+    <td><span class="lastweek">${obj.LW}</span></td>
+    <td><span class="thisweek">${obj.TW}</span></td>
+    <td>
+        <div class="track">
+            <div class="title-artist">
+                <div class="title">
+                    <a href="${obj.Link}" target="_blank" rel="noopener noreferrer"><strong>${obj.Title}</strong>
+                    </a>
+                </div>
+                <div class="artist">
+                    <small>${obj.Artist}</small>
+                </div>
+            </div>
+        </div>
+    </td>
+</tr>
+`});
+}
+  </script>
+
+<script>
+  /**
+   * Copyright (c) 2020 Andrius Sokolnikovas (andriussok)
+   * Repo URI: https://github.com/andriussok/excel-json-html
+   * MIT License.
+   * Version 1.0.0
+   * 
+   * Built using SheetJS, licensed under Apache 2.0
+   * https://github.com/SheetJS/sheetjs
+   */
+</script>
+
+</body>
+</html>
